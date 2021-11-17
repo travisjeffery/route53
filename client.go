@@ -14,8 +14,12 @@ import (
 	"github.com/libdns/libdns"
 )
 
-// NewSession initializes the AWS client
-func (p *Provider) NewSession() error {
+// New initializes a provider.
+func New(c Config) (*Provider, error) {
+	p := &Provider{
+		Config: c,
+	}
+
 	if p.MaxRetries == 0 {
 		p.MaxRetries = 5
 	}
@@ -33,12 +37,12 @@ func (p *Provider) NewSession() error {
 		SharedConfigState: session.SharedConfigEnable,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	p.client = r53.New(sess)
 
-	return nil
+	return p, nil
 }
 
 func (p *Provider) getRecords(ctx context.Context, zoneID string, zone string) ([]libdns.Record, error) {
